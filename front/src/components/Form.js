@@ -1,5 +1,7 @@
-import React, { useRef } from "react"
+import axios from "axios";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components"
+import { toast } from "react-toastify";
 
 const FormContainer = styled.form`
     display: flex;
@@ -36,13 +38,69 @@ const Button = styled.button`
     height: 42px;
     `
 
-const Form = ({onEdit}) => {
+const Form = ({ getUsers, onEdit , setOnEdit}) => {
 
     const ref = useRef();
     
+    useEffect(() => {
+        if (onEdit) {
+            const user = ref.current;
+
+            user.nome.value = onEdit.nome;
+            user.email.value = onEdit.email;
+            user.fone.value = onEdit.fone;
+            user.datanascimento.value = onEdit.datanascimento;
+        }
+    }, [onEdit]);
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const user = ref.current;
+
+        if(
+            !user.nome.value ||
+            !user.email.value ||
+            !user.fone.value ||
+            !user.datanascimento.value 
+        ) {
+            return toast.warn("Prencha todos os campos");
+        }
+
+        if(onEdit) {
+            await axios.
+            put("http://localhost:8000/" + onEdit.id, {
+                nome: user.nome.value,
+                email: user.email.value,
+                fone: user.fone.value,
+                datanascimento: user.datanascimento.value 
+            })
+            .then(({ data }) => toast.success(data))
+            .catch(({ data }) => toast.error(data));
+        } else {
+            await axios.
+            post("http://localhost:8000", {
+                nome: user.nome.value,
+                email: user.email.value,
+                fone: user.fone.value,
+                datanascimento: user.datanascimento.value 
+            })
+            .then(({ data }) => toast.success(data))
+            .catch(({ data }) => toast.error(data));
+        }
+
+        user.nome.value = "";
+        user.email.value = "";
+        user.fone.value = "";
+        user.datanascimento.value = "";
+
+        setOnEdit(null);
+        getUsers();
+
+    };
 
     return (
-        <FormContainer ref={ref}>
+        <FormContainer ref={ref} onSubmit={handleSubmit} >
             <InputArea>
                 <Label>Nome</Label>
                 <Input name="nome"></Input>

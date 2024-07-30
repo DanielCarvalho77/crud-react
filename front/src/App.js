@@ -35,18 +35,18 @@ function App() {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getUsers();
-  }, [setUsers])
+  }, [setUsers]);
 
   return (
     <>
       <Container>
         <Title>Usuários</Title>
-        <Form/>
-        <Grid users={users}/>
+        <Form onEdit={onEdit} setOnEdit={setOnEdit} getUsers={getUsers} />
+        <Grid users={users} setUsers={setUsers} setOnEdit={setOnEdit} getUsers={getUsers} />
       </Container>
-      {/* <ToastContainer autoClose={3000} position={toast.POSITION.BOTTOM_LEFT} /> */}
+      { /*<ToastContainer autoClose={3000} position={toast} /> */ }
       <GlobalStyle/>
     </>
   );
